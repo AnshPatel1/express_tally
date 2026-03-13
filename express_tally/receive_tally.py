@@ -176,7 +176,7 @@ def customer():
             customer['doctype'], customer['customer_code'])
         if not is_exists:
             try:
-                create_account(customer)
+                # create_account(customer)  # Disabled: was hardcoded to ETPL, not needed for VHC
 
                 doc = frappe.get_doc(customer)
                 doc.insert(set_name=customer['customer_code'])
@@ -380,7 +380,7 @@ def supplier():
             supplier['doctype'], supplier['customer_code'])
         if not is_exists:
             try:
-                create_account(supplier)
+                # create_account(supplier)  # Disabled: was hardcoded to ETPL, not needed for VHC
 
                 doc = frappe.get_doc(supplier)
                 doc.insert(set_name=supplier['customer_code'])
