@@ -615,6 +615,9 @@ def item():
     tally_response = []
 
     for item in items:
+        # Force item_code to be the same as item_name
+        item['item_code'] = item['item_name']
+        
         # Try to create HSN code if provided, but don't fail if it doesn't work
         hsn_code = item.get('gst_hsn_code', '').strip() if item.get('gst_hsn_code') else ''
         if hsn_code:
