@@ -618,14 +618,18 @@ def item():
         # Force item_code to be the same as item_name
         item['item_code'] = item['item_name']
         
+        # Clean up UOM
+        uom = item.get('stock_uom', '')
+        if "Not Applicable" in uom:
+            item['stock_uom'] = "Not Applicable"
+
         # Ensure UOM exists
         create_uom(item)
 
-        # Default to 000000 if HSN is missing or empty
-        hsn_code = item.get('gst_hsn_code', '').strip() if item.get('gst_hsn_code') else ''
-        if not hsn_code:
-            hsn_code = "000000"
-            item['gst_hsn_code'] = hsn_code
+        # Format and Validate HSN Code
+        raw_hsn = str(item.get('gst_hsn_code') or '').strip()
+        hsn_code = format_hsn(raw_hsn)
+        item['gst_hsn_code'] = hsn_code
 
         # Try to create HSN, if it fails to exist/be created, fallback to 000000
         create_hsn(item)
@@ -650,6 +654,28 @@ def item():
                     {'name': item['item_name'], 'tally_object': 'Stock Item', 'message': 'Already Exists'})
 
     return {"status": True, 'data': tally_response}
+
+def format_hsn(hsn):
+    if not hsn:
+        return "000000"
+    
+    hsn = str(hsn).strip()
+    length = len(hsn)
+    
+    if length > 8:
+        return "000000"
+    
+    if length in [4, 6, 8]:
+        return hsn
+        
+    if length < 4:
+        return hsn.ljust(4, '0')
+    elif length < 6:
+        return hsn.ljust(6, '0')
+    elif length < 8:
+        return hsn.ljust(8, '0')
+    
+    return "000000"
 
 def create_hsn(item):
     hsn_code = item.get('gst_hsn_code')
