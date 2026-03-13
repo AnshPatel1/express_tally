@@ -615,7 +615,17 @@ def item():
     tally_response = []
 
     for item in items:
-        create_hsn(item)
+        # Try to create HSN code if provided, but don't fail if it doesn't work
+        hsn_code = item.get('gst_hsn_code', '').strip() if item.get('gst_hsn_code') else ''
+        if hsn_code:
+            try:
+                create_hsn(item)
+            except Exception:
+                pass
+        else:
+            # Remove empty HSN so ERPNext doesn't complain
+            item.pop('gst_hsn_code', None)
+
         item_exists = frappe.db.exists(
             'Item', item['item_name'])
         if not item_exists:
@@ -631,18 +641,6 @@ def item():
         else:
             tally_response.append(
                     {'name': item['item_name'], 'tally_object': 'Stock Item', 'message': 'Already Exists'})
-        # else:
-        #     try:
-        #         frappe.db.set_value(item['doctype'], item['item_name'], {
-        #             "item_group_name": item['item_group_name'],
-        #             "is_group": item['is_group']
-        #         })
-
-        #         tally_response.append(
-        #             {'name': item['item_name'], 'tally_object': 'Stock Item', 'message': 'Success'})
-        #     except Exception as e:
-        #         tally_response.append(
-        #             {'name': item['item_name'], 'tally_object': 'Stock ITem', 'message': str(e)})
 
     return {"status": True, 'data': tally_response}
 
