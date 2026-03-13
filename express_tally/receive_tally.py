@@ -20,6 +20,7 @@ def customer_group():
                 tally_response.append(
                     {'name': group['customer_group_name'], 'tally_object': 'Group', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Customer Group Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(group, indent=2)}")
                 tally_response.append(
                     {'name': group['customer_group_name'], 'tally_object': 'Group', 'message': str(e)})
         else:
@@ -59,6 +60,7 @@ def supplier_group():
                 tally_response.append(
                     {'name': group['supplier_group_name'], 'tally_object': 'Group', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Supplier Group Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(group, indent=2)}")
                 tally_response.append(
                     {'name': group['supplier_group_name'], 'tally_object': 'Group', 'message': str(e)})
         else:
@@ -98,6 +100,7 @@ def item_group():
                 tally_response.append(
                     {'name': stockgroup['item_group_name'], 'tally_object': 'Stock Group', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Item Group Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(stockgroup, indent=2)}")
                 tally_response.append(
                     {'name': stockgroup['item_group_name'], 'tally_object': 'Stock Group', 'message': str(e)})
         else:
@@ -137,8 +140,9 @@ def warehouse():
                 tally_response.append(
                     {'name': warehouse['warehouse_name'], 'tally_object': 'Godown', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Warehouse Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(warehouse, indent=2)}")
                 tally_response.append(
-                    {'name': warehouse['item_group_name'], 'tally_object': 'Godown', 'message': str(e)})
+                    {'name': warehouse['warehouse_name'], 'tally_object': 'Godown', 'message': str(e)})
         else:
             tally_response.append(
                     {'name': warehouse['warehouse_name'], 'tally_object': 'Godown', 'message': 'Already Exists'})
@@ -184,6 +188,7 @@ def customer():
                 tally_response.append(
                     {'name': customer['customer_code'], 'tally_object': 'Ledger', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Customer Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(customer, indent=2)}")
                 tally_response.append(
                     {'name': customer['customer_code'], 'tally_object': 'Ledger', 'message': str(e)})
         else:
@@ -283,6 +288,7 @@ def customer_opening():
                 tally_response.append(
                         {'name': bill['customer'], 'tally_object': 'Ledger', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Customer Opening Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(bill, indent=2)}")
                 tally_response.append(
                         {'name': bill['customer'], 'tally_object': 'Ledger', 'message': str(e)})
 
@@ -355,6 +361,7 @@ def supplier_opening():
                 tally_response.append(
                         {'name': bill['supplier'], 'tally_object': 'Ledger', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Supplier Opening Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(bill, indent=2)}")
                 tally_response.append(
                         {'name': bill['supplier'], 'tally_object': 'Ledger', 'message': str(e)})
 
@@ -384,6 +391,7 @@ def supplier():
                 tally_response.append(
                     {'name': supplier['customer_code'], 'tally_object': 'Ledger', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Supplier Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(supplier, indent=2)}")
                 tally_response.append(
                     {'name': supplier['customer_code'], 'tally_object': 'Ledger', 'message': str(e)})
         else:
@@ -428,6 +436,7 @@ def account():
                 tally_response.append(
                     {'name': account['account_name'], 'tally_object': 'Ledger', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Account Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(account, indent=2)}")
                 tally_response.append(
                     {'name': account['account_name'], 'tally_object': 'Ledger', 'message': str(e)})
         else:
@@ -460,8 +469,7 @@ def create_account(customer):
         # return {'name': customer['customer_name'], 'tally_object': 'Ledger_Contact', 'message': 'Success'}
         print('Success- Account')
     except Exception as e:
-        print(str(e))
-        # return {'name': customer['customer_name'], 'tally_object': 'Ledger_Contact', 'message': str(e)}
+        frappe.log_error(title="Create Account Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(customer, indent=2)}")
 
 
 def create_contact(customer):
@@ -520,8 +528,7 @@ def create_contact(customer):
         # return {'name': customer['customer_name'], 'tally_object': 'Ledger_Contact', 'message': 'Success'}
         print('Success- Contact')
     except Exception as e:
-        print(str(e))
-        # return {'name': customer['customer_name'], 'tally_object': 'Ledger_Contact', 'message': str(e)}
+        frappe.log_error(title="Create Contact Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(customer, indent=2)}")
 
 
 def create_address(customer):
@@ -569,8 +576,7 @@ def create_address(customer):
 
         print('Success- Address') # return {'name': customer['customer_code'], 'tally_object': 'Ledger_Address', 'message': 'Success'}
     except Exception as e:
-        print(str(e))
-        # return {'name': customer['customer_code'], 'tally_object': 'Ledger_Address', 'message': str(e)}
+        frappe.log_error(title="Create Address Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(customer, indent=2)}")
 
 
 
@@ -592,6 +598,7 @@ def uom():
                 tally_response.append(
                     {'name': uom['uom_name'], 'tally_object': 'Unit', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="UOM Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(uom, indent=2)}")
                 tally_response.append(
                     {'name': uom['uom_name'], 'tally_object': 'Unit', 'message': str(e)})
         else:
@@ -620,6 +627,7 @@ def item():
                 tally_response.append(
                     {'name': item['item_name'], 'tally_object': 'Stock Item', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Item Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(item, indent=2)}")
                 tally_response.append(
                     {'name': item['item_name'], 'tally_object': 'Stock Item', 'message': str(e)})
         else:
@@ -649,8 +657,11 @@ def create_hsn(item):
                 "doctype": "GST HSN Code"
             }
 
-            doc = frappe.get_doc(req)
-            doc.insert()
+            try:
+                doc = frappe.get_doc(req)
+                doc.insert()
+            except Exception as e:
+                frappe.log_error(title="Create HSN Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(item, indent=2)}")
 
 @frappe.whitelist()
 def voucher():
@@ -671,6 +682,7 @@ def voucher():
                 tally_response.append(
                     {'name': sale['tally_masterid'], 'docname': doc.name, 'tally_object': 'voucher', 'message': 'Success'})
             except Exception as e:
+                frappe.log_error(title="Voucher Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(sale, indent=2)}")
                 tally_response.append(
                     {'name': sale['tally_masterid'], 'tally_object': 'voucher', 'message': str(e)})
         else:
