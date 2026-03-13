@@ -172,14 +172,15 @@ def customer():
     tally_response = []
 
     for customer in customers:
+        code = customer.get('customer_code') or customer.get('customer_name')
         is_exists = frappe.db.exists(
-            customer['doctype'], customer['customer_code'])
+            customer['doctype'], code)
         if not is_exists:
             try:
                 # create_account(customer)  # Disabled: was hardcoded to ETPL, not needed for VHC
 
                 doc = frappe.get_doc(customer)
-                doc.insert(set_name=customer['customer_code'])
+                doc.insert(set_name=code)
 
                 create_contact(customer)
                 create_address(customer)
@@ -376,14 +377,15 @@ def supplier():
     tally_response = []
 
     for supplier in suppliers:
+        code = supplier.get('customer_code') or supplier.get('supplier_name')
         is_exists = frappe.db.exists(
-            supplier['doctype'], supplier['customer_code'])
+            supplier['doctype'], code)
         if not is_exists:
             try:
                 # create_account(supplier)  # Disabled: was hardcoded to ETPL, not needed for VHC
 
                 doc = frappe.get_doc(supplier)
-                doc.insert(set_name=supplier['customer_code'])
+                doc.insert(set_name=code)
 
                 create_contact(supplier)
                 create_address(supplier)
@@ -475,7 +477,7 @@ def create_account(customer):
 def create_contact(customer):
     try:
         doctype = customer['doctype']
-        cus_name = customer['customer_code'] if doctype == 'Customer' else customer['supplier_name']
+        cus_name = customer.get('customer_code') or customer.get('customer_name') or customer.get('supplier_name')
 
         req = {
             "name": customer['ledgercontact'],
@@ -538,7 +540,7 @@ def create_address(customer):
         address3 = customer['address3'] if 'address3' in customer else ""
         address4 = customer['address4'] if 'address4' in customer else ""
         doctype = customer['doctype']
-        cus_name = customer['customer_code'] if doctype == 'Customer' else customer['supplier_name']
+        cus_name = customer.get('customer_code') or customer.get('customer_name') or customer.get('supplier_name')
 
         req = {
             "name": cus_name+"-Billing",
