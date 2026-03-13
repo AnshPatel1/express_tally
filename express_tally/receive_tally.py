@@ -618,16 +618,20 @@ def item():
         # Force item_code to be the same as item_name
         item['item_code'] = item['item_name']
         
+        # Ensure UOM exists
+        create_uom(item)
+
         # Default to 000000 if HSN is missing or empty
         hsn_code = item.get('gst_hsn_code', '').strip() if item.get('gst_hsn_code') else ''
         if not hsn_code:
             hsn_code = "000000"
             item['gst_hsn_code'] = hsn_code
 
-        try:
-            create_hsn(item)
-        except Exception:
-            pass
+        # Try to create HSN, if it fails to exist/be created, fallback to 000000
+        create_hsn(item)
+        if not frappe.db.exists('GST HSN Code', item['gst_hsn_code']):
+            item['gst_hsn_code'] = "000000"
+            create_hsn(item) # Ensure 000000 exists
 
         item_exists = frappe.db.exists(
             'Item', item['item_name'])
@@ -648,19 +652,32 @@ def item():
     return {"status": True, 'data': tally_response}
 
 def create_hsn(item):
-    if 'gst_hsn_code' in item:
-        if not frappe.db.exists('GST HSN Code', item['gst_hsn_code']):
-
+    hsn_code = item.get('gst_hsn_code')
+    if hsn_code:
+        if not frappe.db.exists('GST HSN Code', hsn_code):
             req = {
-                "hsn_code": item['gst_hsn_code'],
+                "hsn_code": hsn_code,
                 "doctype": "GST HSN Code"
             }
-
             try:
                 doc = frappe.get_doc(req)
                 doc.insert()
             except Exception as e:
                 frappe.log_error(title="Create HSN Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(item, indent=2)}")
+
+def create_uom(item):
+    uom = item.get('stock_uom')
+    if uom:
+        if not frappe.db.exists('UOM', uom):
+            try:
+                doc = frappe.get_doc({
+                    "doctype": "UOM",
+                    "uom_name": uom,
+                    "must_be_whole_number": 0 
+                })
+                doc.insert()
+            except Exception as e:
+                frappe.log_error(title="Create UOM Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(item, indent=2)}")
 
 @frappe.whitelist()
 def voucher():
