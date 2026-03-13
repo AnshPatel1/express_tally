@@ -476,43 +476,42 @@ def create_account(customer):
 
 def create_contact(customer):
     try:
-        doctype = customer['doctype']
+        doctype = customer.get('doctype')
         cus_name = customer.get('customer_code') or customer.get('customer_name') or customer.get('supplier_name')
+        contact_name = customer.get('ledgercontact') or cus_name
+        email = customer.get('email') or ""
+        mobile = customer.get('ledgermobile') or ""
 
         req = {
-            "name": customer['ledgercontact'],
-            "first_name": customer['ledgercontact'],
-            "email_id": customer['email']  if 'email' in customer else "",
+            "first_name": contact_name,
+            "email_id": email,
             "status": "Passive",
-            "phone": customer['ledgermobile'] if 'ledgermobile' in customer else "",
-            "mobile_no": customer['ledgermobile'] if 'ledgermobile' in customer else "",
+            "phone": mobile,
+            "mobile_no": mobile,
             "is_primary_contact": 1,
             "is_billing_contact": 1,
             "doctype": "Contact",
             "email_ids": [
                 {
-                    "parent": customer['ledgercontact'],
                     "parentfield": "email_ids",
                     "parenttype": "Contact",
-                    "email_id": customer['email'] if 'email' in customer else "a@b.com",
+                    "email_id": email if email else "no-email@example.com",
                     "is_primary": 1,
                     "doctype": "Contact Email"
                 }
-            ],
+            ] if email else [],
             "phone_nos": [
                 {
-                    "parent": customer['ledgercontact'],
                     "parentfield": "phone_nos",
                     "parenttype": "Contact",
-                    "phone": customer['ledgermobile'] if 'ledgermobile' in customer else "9999999999",
+                    "phone": mobile,
                     "is_primary_phone": 1,
                     "is_primary_mobile_no": 1,
                     "doctype": "Contact Phone"
                 }
-            ],
+            ] if mobile else [],
             "links": [
                 {
-                    "parent": customer['ledgercontact'],
                     "parentfield": "links",
                     "parenttype": "Contact",
                     "link_doctype": doctype,
@@ -523,11 +522,8 @@ def create_contact(customer):
             ],
         }
 
-        # print(req)
         doc = frappe.get_doc(req)
         doc.insert()
-
-        # return {'name': customer['customer_name'], 'tally_object': 'Ledger_Contact', 'message': 'Success'}
         print('Success- Contact')
     except Exception as e:
         frappe.log_error(title="Create Contact Error", message=f"{frappe.get_traceback()}\n\nRequest Data:\n{json.dumps(customer, indent=2)}")
