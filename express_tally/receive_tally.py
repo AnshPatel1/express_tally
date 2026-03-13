@@ -618,16 +618,16 @@ def item():
         # Force item_code to be the same as item_name
         item['item_code'] = item['item_name']
         
-        # Try to create HSN code if provided, but don't fail if it doesn't work
+        # Default to 000000 if HSN is missing or empty
         hsn_code = item.get('gst_hsn_code', '').strip() if item.get('gst_hsn_code') else ''
-        if hsn_code:
-            try:
-                create_hsn(item)
-            except Exception:
-                pass
-        else:
-            # Remove empty HSN so ERPNext doesn't complain
-            item.pop('gst_hsn_code', None)
+        if not hsn_code:
+            hsn_code = "000000"
+            item['gst_hsn_code'] = hsn_code
+
+        try:
+            create_hsn(item)
+        except Exception:
+            pass
 
         item_exists = frappe.db.exists(
             'Item', item['item_name'])
